@@ -69,7 +69,6 @@ ToggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleButton.Font = Enum.Font.SourceSans
 ToggleButton.TextSize = 16
 
--- Мини-панель при сворачивании
 local MinimizedBar = Instance.new("Frame")
 MinimizedBar.Size = UDim2.new(0, 200, 0, 30)
 MinimizedBar.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
@@ -107,7 +106,6 @@ BarCloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 BarCloseButton.Font = Enum.Font.SourceSansBold
 BarCloseButton.TextSize = 18
 
--- Anti-AFK логика
 local antiAFK = false
 local connection
 
@@ -129,7 +127,6 @@ ToggleButton.MouseButton1Click:Connect(function()
     end
 end)
 
--- Кнопки сворачивания / закрытия
 MinimizeButton.MouseButton1Click:Connect(function()
     MinimizedBar.Position = Frame.Position
     MinimizedBar.Visible = true
@@ -162,7 +159,6 @@ BarCloseButton.MouseButton1Click:Connect(function()
     })
 end)
 
--- Биндим клавишу ]
 UserInputService.InputBegan:Connect(function(input, processed)
     if not processed and input.KeyCode == Enum.KeyCode.RightBracket then
         Frame.Visible = not Frame.Visible
