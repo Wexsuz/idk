@@ -23,7 +23,7 @@ Section:NewToggle("Toggle WalkSpeed", "Idk", function(state)
     end
 end)
 
-Section:NewSlider("Speed", "Changes speed", 500, 16, function(s)
+Section:NewSlider("Speed", "Changes speed", 200, 16, function(s)
     currentSpeed = s
     if isWalkSpeedEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
         LocalPlayer.Character.Humanoid.WalkSpeed = currentSpeed
