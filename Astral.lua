@@ -3,61 +3,77 @@ local Window = Library.CreateLib("Astral", "RJTheme7")
 local Tab = Window:NewTab("Main")
 local Section = Tab:NewSection("Speed")
 
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
 local isWalkSpeedEnabled = false
 local currentSpeed = 16
-
-Section:NewToggle("Walkfling", "Idk", function(state)
-	local Players = game:GetService("Players")
-	local RunService = game:GetService("RunService")
-	local LocalPlayer = Players.LocalPlayer
-
-	local function startWalkFling(char)
-	    local Root = char:WaitForChild("HumanoidRootPart")
-	    local Humanoid = char:WaitForChild("Humanoid")
-	    
-	    Humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
-	    Humanoid.BreakJointsOnDeath = false
-	    
-	    game:GetService("RunService").Stepped:Connect(function()
-	        Humanoid.Health = math.huge
-	        Humanoid.MaxHealth = math.huge
-	    end)
-	    
-	    walkflinging = true
-	    Root.CanCollide = true
-	   
-	    spawn(function()
-	        while walkflinging and Root and Root.Parent do
-	            RunService.Heartbeat:Wait()
-	            local vel = Root.Velocity
-	            Root.Velocity = vel * 99999999 + Vector3.new(0, 99999999, 0)
-	            RunService.RenderStepped:Wait()
-	            Root.Velocity = vel
-	            RunService.Stepped:Wait()
-	            Root.Velocity = vel + Vector3.new(0, 0.1, 0)
-	        end
-	    end)
-	end  
-
-	if LocalPlayer.Character then
-	    startWalkFling(LocalPlayer.Character)
-	end
-	LocalPlayer.CharacterAdded:Connect(startWalkFling)
-end)
 
 Section:NewToggle("Toggle WalkSpeed", "Idk", function(state)
     isWalkSpeedEnabled = state
     if not isWalkSpeedEnabled then
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = 16
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.WalkSpeed = 16
+        end
     else
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = currentSpeed
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.WalkSpeed = currentSpeed
+        end
     end
 end)
 
 Section:NewSlider("Speed", "Changes speed", 500, 16, function(s)
     currentSpeed = s
-    if isWalkSpeedEnabled then
-        game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = currentSpeed
+    if isWalkSpeedEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = currentSpeed
+    end
+end)
+
+local walkflinging = false 
+
+local function startWalkFling(char)
+    local Root = char:WaitForChild("HumanoidRootPart")
+    local Humanoid = char:WaitForChild("Humanoid")
+    
+    Humanoid:SetStateEnabled(Enum.HumanoidStateType.Dead, false)
+    Humanoid.BreakJointsOnDeath = false
+    
+    local steppedConnection
+    steppedConnection = RunService.Stepped:Connect(function()
+        if not walkflinging then
+            steppedConnection:Disconnect()
+            return
+        end
+        Humanoid.Health = math.huge
+        Humanoid.MaxHealth = math.huge
+    end)
+    
+    walkflinging = true
+    Root.CanCollide = true
+   
+    spawn(function()
+        while walkflinging and Root and Root.Parent do
+            RunService.Heartbeat:Wait()
+            local vel = Root.Velocity
+            Root.Velocity = vel * 99999999 + Vector3.new(0, 99999999, 0)
+            RunService.RenderStepped:Wait()
+            Root.Velocity = vel
+            RunService.Stepped:Wait()
+            Root.Velocity = vel + Vector3.new(0, 0.1, 0)
+        end
+    end)
+end
+
+Section:NewToggle("Walkfling", "Idk", function(state)
+    walkflinging = state
+    if state then
+        if LocalPlayer.Character then
+            startWalkFling(LocalPlayer.Character)
+        end
+        LocalPlayer.CharacterAdded:Connect(startWalkFling)
+    else
+        
     end
 end)
 
